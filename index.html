@@ -1,0 +1,914 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CryptoMessage | Kelompok 4</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- CryptoJS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: "class"
+        };
+    </script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        textarea,
+        input,
+        button {
+            font-family: inherit;
+        }
+
+        .mono {
+            font-family: "Courier New", Courier, monospace;
+        }
+
+        .tab-active {
+            background: #000;
+            color: #fff;
+        }
+
+        .dark .tab-active {
+            background: #fff;
+            color: #000;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-white text-black transition-colors duration-200 dark:bg-black dark:text-white">
+
+    <!-- ================= HEADER ================= -->
+    <header class="border-b-2 border-black dark:border-white">
+
+        <div class="mx-auto flex max-w-6xl items-center justify-between px-5 py-5">
+
+            <div>
+                <h1 class="text-xl font-black tracking-tight sm:text-2xl">
+                    CRYPTOMESSAGE
+                </h1>
+
+                <p class="mt-1 text-xs uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400">
+                    Encryption / Decryption Tool
+                </p>
+            </div>
+
+            <!-- Theme -->
+            <button
+                id="themeButton"
+                class="border-2 border-black px-4 py-2 text-xs font-bold uppercase tracking-wider transition hover:bg-black hover:text-white dark:border-white dark:hover:bg-white dark:hover:text-black"
+            >
+                DARK
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <!-- ================= MAIN ================= -->
+    <main class="mx-auto max-w-6xl px-5 py-8">
+
+        <!-- Title -->
+        <div class="mb-8">
+
+            <p class="mb-2 text-xs font-bold uppercase tracking-[0.25em] text-gray-500">
+                Kelompok 4
+            </p>
+
+            <h2 class="text-3xl font-black tracking-tight sm:text-4xl">
+                ENKRIPSI & DEKRIPSI PESAN
+            </h2>
+
+            <div class="mt-4 h-1 w-20 bg-black dark:bg-white"></div>
+
+        </div>
+
+
+        <!-- ================= APPLICATION ================= -->
+        <section class="border-2 border-black dark:border-white">
+
+
+            <!-- Algorithm Header -->
+            <div class="border-b-2 border-black bg-black px-5 py-4 text-white dark:border-white dark:bg-white dark:text-black">
+
+                <div class="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
+
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-widest opacity-70">
+                            Algorithm
+                        </p>
+
+                        <h3 id="algorithmTitle" class="text-lg font-black">
+                            AES
+                        </h3>
+                    </div>
+
+                    <span class="mono text-xs">
+                        SELECT METHOD
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- Tabs -->
+            <div class="grid grid-cols-3 border-b-2 border-black dark:border-white">
+
+                <button
+                    class="algorithm-tab tab-active border-r border-black px-3 py-4 text-sm font-black uppercase transition dark:border-white"
+                    data-algorithm="AES"
+                >
+                    AES
+                </button>
+
+                <button
+                    class="algorithm-tab border-r border-black px-3 py-4 text-sm font-black uppercase transition hover:bg-gray-100 dark:border-white dark:hover:bg-gray-900"
+                    data-algorithm="Caesar"
+                >
+                    Caesar
+                </button>
+
+                <button
+                    class="algorithm-tab px-3 py-4 text-sm font-black uppercase transition hover:bg-gray-100 dark:hover:bg-gray-900"
+                    data-algorithm="Base64"
+                >
+                    Base64
+                </button>
+
+            </div>
+
+
+            <!-- Content -->
+            <div class="space-y-7 p-5 sm:p-8">
+
+
+                <!-- ================= AES SETTINGS ================= -->
+                <div id="aesSettings">
+
+                    <label class="mb-2 block text-xs font-black uppercase tracking-widest">
+                        Secret Key
+                    </label>
+
+                    <div class="flex">
+
+                        <input
+                            id="secretKey"
+                            type="password"
+                            placeholder="Masukkan secret key..."
+                            class="min-w-0 flex-1 border-2 border-black bg-white px-4 py-3 text-sm outline-none focus:bg-gray-100 dark:border-white dark:bg-black dark:focus:bg-gray-900"
+                        >
+
+                        <button
+                            id="showKey"
+                            class="border-y-2 border-r-2 border-black px-4 text-xs font-bold hover:bg-black hover:text-white dark:border-white dark:hover:bg-white dark:hover:text-black"
+                        >
+                            SHOW
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================= CAESAR SETTINGS ================= -->
+                <div id="caesarSettings" class="hidden">
+
+                    <label class="mb-2 block text-xs font-black uppercase tracking-widest">
+                        Shift / Pergeseran
+                    </label>
+
+                    <input
+                        id="shiftValue"
+                        type="number"
+                        value="3"
+                        min="-25"
+                        max="25"
+                        class="w-full border-2 border-black bg-white px-4 py-3 text-sm outline-none focus:bg-gray-100 dark:border-white dark:bg-black dark:focus:bg-gray-900"
+                    >
+
+                    <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                        Contoh: Shift 3 → A menjadi D.
+                    </p>
+
+                </div>
+
+
+                <!-- ================= BASE64 SETTINGS ================= -->
+                <div id="base64Settings" class="hidden">
+
+                    <div class="border-2 border-dashed border-black p-4 text-sm dark:border-white">
+
+                        <p class="font-bold">
+                            BASE64 ENCODING
+                        </p>
+
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                            Tidak membutuhkan Secret Key.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================= INPUT ================= -->
+                <div>
+
+                    <div class="mb-2 flex items-center justify-between">
+
+                        <label class="text-xs font-black uppercase tracking-widest">
+                            Input Message
+                        </label>
+
+                        <span
+                            id="inputCount"
+                            class="mono text-xs text-gray-500"
+                        >
+                            0 characters
+                        </span>
+
+                    </div>
+
+                    <textarea
+                        id="inputText"
+                        rows="8"
+                        placeholder="Masukkan pesan di sini..."
+                        class="w-full resize-y border-2 border-black bg-white px-4 py-4 text-sm leading-relaxed outline-none focus:bg-gray-100 dark:border-white dark:bg-black dark:focus:bg-gray-900"
+                    ></textarea>
+
+                </div>
+
+
+                <!-- ================= ACTION BUTTON ================= -->
+                <div class="grid grid-cols-2 gap-3">
+
+                    <button
+                        id="encryptButton"
+                        class="border-2 border-black bg-black px-4 py-4 text-sm font-black uppercase tracking-wider text-white transition hover:bg-white hover:text-black dark:border-white dark:bg-white dark:text-black dark:hover:bg-black dark:hover:text-white"
+                    >
+                        ENCRYPT
+                    </button>
+
+                    <button
+                        id="decryptButton"
+                        class="border-2 border-black bg-white px-4 py-4 text-sm font-black uppercase tracking-wider text-black transition hover:bg-black hover:text-white dark:border-white dark:bg-black dark:text-white dark:hover:bg-white dark:hover:text-black"
+                    >
+                        DECRYPT
+                    </button>
+
+                </div>
+
+
+                <!-- ================= OUTPUT ================= -->
+                <div>
+
+                    <div class="mb-2 flex items-center justify-between">
+
+                        <label class="text-xs font-black uppercase tracking-widest">
+                            Output
+                        </label>
+
+                        <span
+                            id="outputCount"
+                            class="mono text-xs text-gray-500"
+                        >
+                            0 characters
+                        </span>
+
+                    </div>
+
+                    <textarea
+                        id="outputText"
+                        rows="8"
+                        readonly
+                        placeholder="Hasil akan muncul di sini..."
+                        class="mono w-full resize-y border-2 border-black bg-gray-100 px-4 py-4 text-sm leading-relaxed outline-none dark:border-white dark:bg-gray-900"
+                    ></textarea>
+
+                </div>
+
+
+                <!-- ================= OUTPUT BUTTON ================= -->
+                <div class="grid grid-cols-2 gap-3">
+
+                    <button
+                        id="copyButton"
+                        class="border-2 border-black px-4 py-3 text-sm font-black uppercase transition hover:bg-black hover:text-white dark:border-white dark:hover:bg-white dark:hover:text-black"
+                    >
+                        COPY
+                    </button>
+
+                    <button
+                        id="clearButton"
+                        class="border-2 border-black px-4 py-3 text-sm font-black uppercase transition hover:bg-black hover:text-white dark:border-white dark:hover:bg-white dark:hover:text-black"
+                    >
+                        CLEAR
+                    </button>
+
+                </div>
+
+
+                <!-- ================= STATUS ================= -->
+                <div
+                    id="status"
+                    class="hidden border-2 border-black px-4 py-3 text-sm font-bold dark:border-white"
+                ></div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- ================= FOOTER ================= -->
+    <footer class="border-t-2 border-black dark:border-white">
+
+        <div class="mx-auto flex max-w-6xl flex-col justify-between gap-2 px-5 py-6 text-xs sm:flex-row">
+
+            <p class="font-black uppercase tracking-widest">
+                Kelompok 4
+            </p>
+
+            <p class="text-gray-500">
+                CryptoMessage — Encryption & Decryption
+            </p>
+
+        </div>
+
+    </footer>
+
+
+    <!-- ================= JAVASCRIPT ================= -->
+    <script>
+
+        let currentAlgorithm = "AES";
+
+
+        // Elements
+        const inputText = document.getElementById("inputText");
+        const outputText = document.getElementById("outputText");
+
+        const secretKey = document.getElementById("secretKey");
+        const shiftValue = document.getElementById("shiftValue");
+
+        const aesSettings = document.getElementById("aesSettings");
+        const caesarSettings = document.getElementById("caesarSettings");
+        const base64Settings = document.getElementById("base64Settings");
+
+        const algorithmTitle = document.getElementById("algorithmTitle");
+
+        const inputCount = document.getElementById("inputCount");
+        const outputCount = document.getElementById("outputCount");
+
+        const status = document.getElementById("status");
+
+        const tabs = document.querySelectorAll(".algorithm-tab");
+
+
+        // ===============================
+        // TAB / ALGORITHM
+        // ===============================
+
+        tabs.forEach(tab => {
+
+            tab.addEventListener("click", () => {
+
+                currentAlgorithm = tab.dataset.algorithm;
+
+                tabs.forEach(item => {
+
+                    item.classList.remove("tab-active");
+
+                });
+
+                tab.classList.add("tab-active");
+
+                algorithmTitle.textContent = currentAlgorithm;
+
+                aesSettings.classList.add("hidden");
+                caesarSettings.classList.add("hidden");
+                base64Settings.classList.add("hidden");
+
+                if (currentAlgorithm === "AES") {
+                    aesSettings.classList.remove("hidden");
+                }
+
+                if (currentAlgorithm === "Caesar") {
+                    caesarSettings.classList.remove("hidden");
+                }
+
+                if (currentAlgorithm === "Base64") {
+                    base64Settings.classList.remove("hidden");
+                }
+
+            });
+
+        });
+
+
+        // ===============================
+        // AES
+        // ===============================
+
+        function encryptAES(text, key) {
+
+            return CryptoJS.AES.encrypt(
+                text,
+                key
+            ).toString();
+
+        }
+
+
+        function decryptAES(text, key) {
+
+            const decrypted = CryptoJS.AES.decrypt(
+                text,
+                key
+            );
+
+            const result = decrypted.toString(
+                CryptoJS.enc.Utf8
+            );
+
+            if (!result) {
+                throw new Error("Invalid AES key");
+            }
+
+            return result;
+
+        }
+
+
+        // ===============================
+        // CAESAR
+        // ===============================
+
+        function caesar(text, shift) {
+
+            return [...text].map(character => {
+
+                const code = character.charCodeAt(0);
+
+                // Uppercase
+                if (code >= 65 && code <= 90) {
+
+                    return String.fromCharCode(
+                        ((code - 65 + shift) % 26 + 26) % 26 + 65
+                    );
+
+                }
+
+                // Lowercase
+                if (code >= 97 && code <= 122) {
+
+                    return String.fromCharCode(
+                        ((code - 97 + shift) % 26 + 26) % 26 + 97
+                    );
+
+                }
+
+                return character;
+
+            }).join("");
+
+        }
+
+
+        // ===============================
+        // BASE64
+        // ===============================
+
+        function base64Encode(text) {
+
+            const bytes = new TextEncoder().encode(text);
+
+            let binary = "";
+
+            bytes.forEach(byte => {
+
+                binary += String.fromCharCode(byte);
+
+            });
+
+            return btoa(binary);
+
+        }
+
+
+        function base64Decode(text) {
+
+            const binary = atob(text.trim());
+
+            const bytes = Uint8Array.from(
+                binary,
+                character => character.charCodeAt(0)
+            );
+
+            return new TextDecoder().decode(bytes);
+
+        }
+
+
+        // ===============================
+        // ENCRYPT
+        // ===============================
+
+        document.getElementById("encryptButton")
+            .addEventListener("click", () => {
+
+                const text = inputText.value;
+
+                if (!text) {
+
+                    showStatus(
+                        "ERROR: Input message masih kosong.",
+                        true
+                    );
+
+                    return;
+
+                }
+
+
+                try {
+
+                    let result;
+
+
+                    if (currentAlgorithm === "AES") {
+
+                        if (!secretKey.value) {
+
+                            showStatus(
+                                "ERROR: Secret Key wajib diisi.",
+                                true
+                            );
+
+                            return;
+
+                        }
+
+                        result = encryptAES(
+                            text,
+                            secretKey.value
+                        );
+
+                    }
+
+
+                    if (currentAlgorithm === "Caesar") {
+
+                        const shift = Number(
+                            shiftValue.value
+                        );
+
+                        result = caesar(
+                            text,
+                            shift
+                        );
+
+                    }
+
+
+                    if (currentAlgorithm === "Base64") {
+
+                        result = base64Encode(text);
+
+                    }
+
+
+                    outputText.value = result;
+
+                    updateCounter();
+
+                    showStatus(
+                        "SUCCESS: Pesan berhasil dienkripsi.",
+                        false
+                    );
+
+                }
+
+                catch (error) {
+
+                    showStatus(
+                        "ERROR: Enkripsi gagal.",
+                        true
+                    );
+
+                }
+
+            });
+
+
+        // ===============================
+        // DECRYPT
+        // ===============================
+
+        document.getElementById("decryptButton")
+            .addEventListener("click", () => {
+
+                const text = inputText.value;
+
+                if (!text) {
+
+                    showStatus(
+                        "ERROR: Input message masih kosong.",
+                        true
+                    );
+
+                    return;
+
+                }
+
+
+                try {
+
+                    let result;
+
+
+                    if (currentAlgorithm === "AES") {
+
+                        if (!secretKey.value) {
+
+                            showStatus(
+                                "ERROR: Secret Key wajib diisi.",
+                                true
+                            );
+
+                            return;
+
+                        }
+
+                        result = decryptAES(
+                            text,
+                            secretKey.value
+                        );
+
+                    }
+
+
+                    if (currentAlgorithm === "Caesar") {
+
+                        const shift = Number(
+                            shiftValue.value
+                        );
+
+                        result = caesar(
+                            text,
+                            -shift
+                        );
+
+                    }
+
+
+                    if (currentAlgorithm === "Base64") {
+
+                        result = base64Decode(text);
+
+                    }
+
+
+                    outputText.value = result;
+
+                    updateCounter();
+
+                    showStatus(
+                        "SUCCESS: Pesan berhasil didekripsi.",
+                        false
+                    );
+
+                }
+
+                catch (error) {
+
+                    showStatus(
+                        "ERROR: Data tidak valid atau key salah.",
+                        true
+                    );
+
+                }
+
+            });
+
+
+        // ===============================
+        // COPY
+        // ===============================
+
+        document.getElementById("copyButton")
+            .addEventListener("click", async () => {
+
+                if (!outputText.value) {
+
+                    showStatus(
+                        "ERROR: Tidak ada output untuk disalin.",
+                        true
+                    );
+
+                    return;
+
+                }
+
+
+                try {
+
+                    await navigator.clipboard.writeText(
+                        outputText.value
+                    );
+
+                    showStatus(
+                        "SUCCESS: Output berhasil disalin.",
+                        false
+                    );
+
+                }
+
+                catch {
+
+                    outputText.select();
+
+                    document.execCommand("copy");
+
+                    showStatus(
+                        "SUCCESS: Output berhasil disalin.",
+                        false
+                    );
+
+                }
+
+            });
+
+
+        // ===============================
+        // CLEAR
+        // ===============================
+
+        document.getElementById("clearButton")
+            .addEventListener("click", () => {
+
+                inputText.value = "";
+                outputText.value = "";
+
+                updateCounter();
+
+                showStatus(
+                    "Input dan output telah dibersihkan.",
+                    false
+                );
+
+            });
+
+
+        // ===============================
+        // COUNTER
+        // ===============================
+
+        function updateCounter() {
+
+            inputCount.textContent =
+                `${inputText.value.length} characters`;
+
+            outputCount.textContent =
+                `${outputText.value.length} characters`;
+
+        }
+
+
+        inputText.addEventListener(
+            "input",
+            updateCounter
+        );
+
+
+        // ===============================
+        // STATUS
+        // ===============================
+
+        function showStatus(message, error) {
+
+            status.textContent = message;
+
+            status.classList.remove(
+                "hidden",
+                "bg-black",
+                "text-white",
+                "bg-white",
+                "text-black"
+            );
+
+
+            if (error) {
+
+                status.classList.add(
+                    "bg-black",
+                    "text-white"
+                );
+
+            }
+
+            else {
+
+                status.classList.add(
+                    "bg-white",
+                    "text-black"
+                );
+
+            }
+
+            setTimeout(() => {
+
+                status.classList.add("hidden");
+
+            }, 3000);
+
+        }
+
+
+        // ===============================
+        // SHOW / HIDE KEY
+        // ===============================
+
+        document.getElementById("showKey")
+            .addEventListener("click", () => {
+
+                if (secretKey.type === "password") {
+
+                    secretKey.type = "text";
+
+                    document.getElementById("showKey")
+                        .textContent = "HIDE";
+
+                }
+
+                else {
+
+                    secretKey.type = "password";
+
+                    document.getElementById("showKey")
+                        .textContent = "SHOW";
+
+                }
+
+            });
+
+
+        // ===============================
+        // DARK / LIGHT
+        // ===============================
+
+        const themeButton =
+            document.getElementById("themeButton");
+
+
+        function updateThemeButton() {
+
+            const dark =
+                document.documentElement
+                    .classList.contains("dark");
+
+            themeButton.textContent =
+                dark ? "LIGHT" : "DARK";
+
+        }
+
+
+        themeButton.addEventListener(
+            "click",
+            () => {
+
+                document.documentElement
+                    .classList.toggle("dark");
+
+                updateThemeButton();
+
+            }
+        );
+
+
+        updateThemeButton();
+
+        updateCounter();
+
+    </script>
+
+</body>
+</html>
+```
